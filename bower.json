@@ -1,0 +1,17 @@
+{
+    "name": "matrix-9-by-9",
+    "version": "0.0.0",
+    "description": "a 9 by 9 matrix suitable for sudoku and st8ts",
+    "license": "MIT",
+    "main": "src/matrix-9-by-9.html",
+    "keywords": [
+        "web-components"
+    ],
+    "ignore": [
+        "**/.*",
+        "bower_components"
+    ],
+    "dependencies": {
+        "platform": "Polymer/platform#~0.3.3"
+    }
+}

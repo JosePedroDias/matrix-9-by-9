@@ -1,0 +1,214 @@
+<script type="text/javascript">
+    (function() {
+        'use strict';
+
+        var thatDoc = document;
+
+        // refers to the "importee", which is src/hello-world.html
+        var thisDoc = document._currentScript.ownerDocument;
+
+
+        var r = function(len, min) {
+            return ~~( Math.random() * len) + (min || 0);
+        };
+
+
+
+        var Cell = function(value, hints, negative) {
+            this.value    =   value    || undefined;
+            this.hints    =   hints    || [];
+            this.hintsO = {};
+            for (var i = 0, I = this.hints.length; i < I; ++i) {
+                this.hintsO[ this.hints[i] ] = true;
+            }
+            this.negative = !!negative;
+        };
+
+        Cell.prototype = {
+            setup: function(sty) {
+                this.sty = sty;
+            },
+            setPosition: function(pos) {
+                this.pos = pos;
+            },
+            setDimensions: function(dims) {
+                this.dims = dims;
+                var d = dims[0];
+                this.breakpoints = [
+                    ~~(d * 1/6),
+                    ~~(d * 1/2),
+                    ~~(d * 5/6)
+                ];
+                this.fontSizes = [
+                    ~~(d * 0.9      ) + 'px sans-serif',
+                    'bold ' + ~~(d * 0.9 * 1/3) + 'px sans-serif'
+                ];
+            },
+            draw: function(ctx) {
+                var c = ctx;
+                var p = this.pos;
+                var d = this.dims;
+                var s = this.sty;
+                var bp = this.breakpoints;
+
+                c.save();
+                c.translate(p[0], p[1]);
+                //c.fillStyle = ['rgb(', r(256), ',', r(256), ',', r(256), ')'].join('');
+                //c.fillStyle = ['rgb(', r(128, 128), ',', r(128, 128), ',', r(128, 128), ')'].join('');
+                c.fillStyle = (this.highlight ? s.highlightColor : (this.negative ? s.fgColor : s.bgColor) );
+                c.fillRect(0, 0, d[0], d[1]);
+
+                c.fillStyle = this.negative ? s.bgColor : s.fgColor;
+
+                c.font = this.fontSizes[0];
+                if (this.value) {
+                    c.fillText(this.value, bp[1], bp[1]);
+                }
+
+                c.font = this.fontSizes[1];
+                var h, x, y;
+                for (y = 0; y < 3; ++y) {
+                    for (x = 0; x < 3; ++x) {
+                        h = y*3+x+1;
+                        if (this.hintsO[h]) {
+                            c.fillText(h, bp[x], bp[y]);
+                        }
+                    }
+                }
+
+                c.restore();
+            },
+            getValue: function() {
+                return this.value;
+            },
+            setValue: function(val) {
+                this.value = val;
+            },
+            unsetValue: function() {
+                this.value = undefined;
+            },
+            getHints: function() {
+                return this.hints;
+            },
+            getHint: function(n) {
+                return this.hintsO[n];
+            },
+            setHint: function(n) {
+                this._setHint(n, true);
+            },
+            unsetHint: function() {
+                this._setHint(n, false);
+            },
+            _setHint: function(n, val) {
+                if (val) {
+                    this.hintsO[n] = true;
+                }
+                else {
+                    delete this.hintsO[n];
+                }
+                var arr = [];
+                for (var k in this.hintsO) {
+                    arr.push( parseInt(k, 10) );
+                }
+                this.hints = arr;
+            },
+            toggleHint: function(n) {
+                this._setHint(n, !this.getHint(n) );
+            },
+            setHighlight: function(active) {
+                if (this.negative) { return; }
+                this.highlight = active;
+            }
+        };
+
+
+
+        // creates an object based in the HTML Element prototype
+        var element = Object.create(HTMLElement.prototype);
+
+        // fires when an instance of the element is created
+        element.createdCallback = function() {
+            // creates the shadow root
+            var rootEl = this.createShadowRoot();
+
+            var d = [400, 400];
+            this.bgColor = '#FFFFFF';
+            this.fgColor = '#000000';
+            this.highlightColor = '#FFFFCC';
+
+            var topEl = document.createElement('div');
+            topEl.style.display = 'inline-block';
+
+            var canvasEl = document.createElement('canvas');
+            canvasEl.setAttribute('width',  d[0]);
+            canvasEl.setAttribute('height', d[1]);
+
+            topEl.appendChild(canvasEl);
+            rootEl.appendChild(topEl);
+
+            this.canvasEl = canvasEl;
+            this.dims = d;
+
+            this.cellsArray = [];
+            this.cells = new Array(9);
+            for (var col, cell, x, y, X, Y, j, i = 0; i < 9; ++i) {
+                col = new Array(9);
+                this.cells[i] = col;
+                for (j = 0; j < 9; ++j) {
+                    x = Math.floor(d[0]/9*i);
+                    y = Math.floor(d[1]/9*j);
+                    X = Math.floor(d[0]/9*(i+1));
+                    Y = Math.floor(d[1]/9*(j+1));
+                    cell = new Cell(
+                        r(9, 1),            // value
+                        [r(5, 1), r(4, 6)], // hints
+                        r(5) === 0          // negative
+                    );
+                    cell.setup(this);
+                    cell.setPosition([x, y]);
+                    cell.setDimensions([X-x, Y-y]);
+                    if (r(3) === 0) {
+                        cell.setHighlight(true);
+                    }
+                    col[j] = cell;
+                    this.cellsArray.push(cell);
+                }
+            }
+        };
+
+        // fires when an instance was inserted into the document
+        element.attachedCallback = function() {
+            this.ctx = this.canvasEl.getContext('2d');
+            var d = this.dims;
+            var c = this.ctx;
+            c.textAlign = 'center';
+            c.textBaseline = 'middle';
+            c.fillStyle = this.bgColor;
+            c.fillRect(0, 0, d[0], d[1]);
+            //c.fillStyle = this.fgColor;
+            //c.fillRect(10, 10, 40, 40);
+
+            this.refresh();
+        };
+
+        // fires when an instance was removed from the document
+        element.detachedCallback = function() {
+
+        };
+
+        // Fires when an attribute was added, removed, or updated
+        element.attributeChangedCallback = function(attr, oldVal, newVal) {
+
+        };
+
+        element.refresh = function() {
+            for (var i = 0; i < 81; ++i) {
+                this.cellsArray[i].draw(this.ctx);
+            }
+        };
+
+        document.registerElement('matrix-9-by-9', {
+            prototype: element
+        });
+    }());
+</script>
