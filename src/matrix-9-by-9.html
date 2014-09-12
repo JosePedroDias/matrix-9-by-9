@@ -58,10 +58,12 @@
             setValue: function(val) {
                 this._value = val;
                 this._refresh();
+                return this;
             },
             unsetValue: function() {
                 this._value = undefined;
                 this._refresh();
+                return this;
             },
             setHints: function(hints) {
                 if (hints.length > 0) {
@@ -73,29 +75,35 @@
                     this._hintsO[ this._hints[i] ] = true;
                 }
                 this._refresh();
+                return this;
             },
             setHint: function(n) {
                 this._value = undefined;
                 this._setHint(n, true);
                 this._refresh();
+                return this;
             },
             unsetHint: function() {
                 this._setHint(n, false);
                 this._refresh();
+                return this;
             },
             toggleHint: function(n) {
                 this._setHint(n, !this.getHint(n) );
                 this._refresh();
+                return this;
             },
             setNegative: function(negative) {
                 this._negative = !!negative;
                 this._refresh();
+                return this;
             },
             setHighlight: function(active) {
                 if (!this._negative) {
                     this._highlight = !!active;
                 }
                 this._refresh();
+                return this;
             },
             setData: function(data) {
                 var num,
@@ -119,6 +127,7 @@
                 this.setNegative(negative);
                 this._update = true;
                 this.setHighlight(false);
+                return this;
             },
 
             _setup: function(pos, dims) {
@@ -261,6 +270,49 @@
             }
         };
 
+
+
+        element.getData = function() {
+            var rows = new Array(9);
+            for (var row, j = 0; j < 9; ++j) {
+                row = new Array(9);
+                for (var i = 0; i < 9; ++i) {
+                    row[i] = this._cells[i][j].getData();
+                }
+                row = row.join(' ');
+                rows[j] = row;
+            }
+            return rows.join('\n');
+        };
+
+        element.getCell = function(x, y) {
+            return this._cells[x-1][y-1];
+        };
+
+
+
+        element.setData = function(data) {
+            data = data.replace(/([ \t]+)/gm, ' ');
+            data = data.replace(/^([ \t]+)/gm, '');
+            data = data.replace(/([ \t]+)$/gm, '');
+            var rows = data.split('\n');
+            for (var row, j = 0; j < 9; ++j) {
+                row = rows[j];
+                row = row.split(' ');
+                for (var i = 0; i < 9; ++i) {
+                    this._cells[i][j].setData(row[i]);
+                }
+            }
+            return this;
+        };
+
+        element.setCellData = function(x, y) {
+            this._cells[x-1][y-1].setData(val);
+            return this;
+        };
+
+
+
         element._refresh = function() {
             for (var i = 0; i < 81; ++i) {
                 this._cellsArray[i]._refresh();
@@ -296,40 +348,7 @@
             this._refresh();
         };
 
-        element.setData = function(data) {
-            data = data.replace(/([ \t]+)/gm, ' ');
-            data = data.replace(/^([ \t]+)/gm, '');
-            data = data.replace(/([ \t]+)$/gm, '');
-            var rows = data.split('\n');
-            for (var row, j = 0; j < 9; ++j) {
-                row = rows[j];
-                row = row.split(' ');
-                for (var i = 0; i < 9; ++i) {
-                    this._cells[i][j].setData(row[i]);
-                }
-            }
-        };
 
-        element.getData = function() {
-            var rows = new Array(9);
-            for (var row, j = 0; j < 9; ++j) {
-                row = new Array(9);
-                for (var i = 0; i < 9; ++i) {
-                    row[i] = this._cells[i][j].getData();
-                }
-                row = row.join(' ');
-                rows[j] = row;
-            }
-            return rows.join('\n');
-        };
-
-        element.setCellData = function(x, y) {
-            this._cells[x-1][y-1].setData(val);
-        };
-
-        element.getCell = function(x, y) {
-            return this._cells[x-1][y-1];
-        };
 
         document.registerElement('matrix-9-by-9', {
             prototype: element
