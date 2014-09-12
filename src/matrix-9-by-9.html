@@ -16,11 +16,12 @@
 
 
         var Cell = function(ctx, sty) {
-            this._value     = undefined;
-            this._hints     = [];
-            this._hintsO    = {};
-            this._negative  = false;
-            this._highlight = false;
+            this._value          = undefined;
+            this._hints          = [];
+            this._hintsO         = {};
+            this._invertedState  = false;
+            this._highlightState = false;
+            this._frozenState    = false;
 
             this._ctx = ctx;
             this._sty = sty;
@@ -37,17 +38,20 @@
             getHint: function(n) {
                 return this._hintsO[n];
             },
-            getNegative: function() {
-                return this._negative;
+            getInvertedState: function() {
+                return this._invertedState;
             },
-            getHighlight: function() {
-                return this._highlight;
+            getHighlightState: function() {
+                return this._highlightState;
+            },
+            getFrozenState: function() {
+                return this._frozenState;
             },
             getData: function() {
                 return [
-                    (this._negative ? '[' : ''),
+                    (this._invertedState ? '[' : ''),
                     (this._value ? this._value : (this._hints.length > 0 ? '('+this._hints+')' : '_') ),
-                    (this._negative ? ']' : '')
+                    (this._invertedState ? ']' : '')
                 ].join('');
             },
 
@@ -89,26 +93,31 @@
                 this._refresh();
                 return this;
             },
-            setNegative: function(negative) {
-                this._negative = !!negative;
+            setInvertedState: function(invertedState) {
+                this._invertedState = !!invertedState;
                 this._refresh();
                 return this;
             },
-            setHighlight: function(active) {
-                if (!this._negative) {
-                    this._highlight = !!active;
+            setHighlightState: function(highlightState) {
+                if (!this._invertedState) {
+                    this._highlightState = !!highlightState;
                 }
+                this._refresh();
+                return this;
+            },
+            setFrozenState: function(frozenState) {
+                this._frozenState = frozenState;
                 this._refresh();
                 return this;
             },
             setData: function(data) {
                 var num,
                     hints = [],
-                    negative = false;
+                    inverted = false;
 
                 if (data[0] === '[') {
                     data = data.split(''); data.shift(); data.pop(); data = data.join('');
-                    negative = true;
+                    inverted = true;
                 }
                 else if (data[0] === '(') {
                     data = data.split(''); data.shift(); data.pop(); data = data.join('');
@@ -120,9 +129,9 @@
                 this._update = false;
                 this.setValue(num);
                 this.setHints(hints);
-                this.setNegative(negative);
+                this.setInvertedState(inverted);
                 this._update = true;
-                this.setHighlight(false);
+                this.setHighlightState(false);
                 return this;
             },
 
@@ -154,10 +163,10 @@
                 c.save();
                 c.translate(p[0], p[1]);
                 // c.fillStyle = ['rgb(', r(128, 128), ',', r(128, 128), ',', r(128, 128), ')'].join('');
-                c.fillStyle = (this._highlight ? s.highlightColor : (this._negative ? s.fgColor : s.bgColor) );
+                c.fillStyle = (this._highlightState ? s.highlightColor : (this._invertedState ? s.fgColor : s.bgColor) );
                 c.fillRect(0, 0, d[0], d[1]);
 
-                c.fillStyle = this._negative ? s.bgColor : s.fgColor;
+                c.fillStyle = this._invertedState ? s.bgColor : (this._frozenState ? s.frozenColor : s.fgColor);
 
                 c.font = this._fontSizes[0];
                 if (this._value) {
@@ -211,6 +220,7 @@
             this._styles = {
                 bgColor:        '#FFFFFF',
                 fgColor:        '#000000',
+                frozenColor:    '#777777',
                 highlightColor: '#FFFFCC'
             };
 

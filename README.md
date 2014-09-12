@@ -53,9 +53,11 @@ you can affect single cells by calling the cell's API directly. Ex: `mtxEl.getCe
 
 * **`{Boolean} getHint({Number}number)`** - return true iif given hint is marked
 
-* **`{Boolean} getNegative()`** - return true if negative is set
+* **`{Boolean} getInvertedState()`** - return true if inverted state is set
 
-* **`{Boolean} getHighlight()`** - returns true if highlight is set
+* **`{Boolean} getHighlightState()`** - returns true if highlight state is set
+
+* **`{Boolean} getFrozenState()`** - returns true if frozen state is set
 
 * **`{String} getData()`** - returns cell in matrix notation
 
@@ -74,9 +76,11 @@ you can affect single cells by calling the cell's API directly. Ex: `mtxEl.getCe
 
 * **`{Cell} toggleHint({Number}number)`** - toggle given hint marked state
 
-* **`{Cell} setNegative({Boolean}negative)`** - sets cell's negative state
+* **`{Cell} setInvertedState({Boolean}inverted)`** - sets cell's inverted state
 
-* **`{Cell} setHighlight({Boolean}highlight)`** - sets cell's highlight state
+* **`{Cell} setHighlightState({Boolean}highlight)`** - sets cell's highlight state
+
+* **`{Cell} setFrozenState({Boolean}highlight)`** - sets cell's frozen state
 
 * **`{Cell} setData({String}data)`** - sets cell's data using matrix notation
 

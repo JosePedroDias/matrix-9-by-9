@@ -32,18 +32,34 @@
     </head>
 
     <body>
+        <h1>matrix-9-by-9 and numpad-1-to-9 webcomponents demo</h1>
+
+        <p>
+            <a href="https://github.com/JosePedroDias/matrix-9-by-9">project on github</a>
+            <a href="http://webcomponents.org/">webcomponents info</a>
+        </p>
+
         <!-- Using Custom Elements -->
         <div class="ctn">
             <matrix-9-by-9 side="360" id="m"></matrix-9-by-9>
             <numpad-1-to-9 id="n"></numpad-1-to-9>
         </div>
 
+        <p>
+            If you're wondering, this is a
+            <a href="http://www.str8ts.com/">str8ts</a> puzzle.<br/>
+            These elements could also be used for sudoku.
+        </p>
+
         <script type="text/javascript">
+            // get elements
             var mtxEl    = document.querySelector('#m');
             var numpadEl = document.querySelector('#n');
 
+            // internal state
             var lastSelectedCell;
 
+            // set puzzle...
             // first level of easy on android's st8ts lite
             mtxEl.setData([
                 '[_]  _   3   _  [_]  _   _   7  [_]',
@@ -57,14 +73,29 @@
                 '[_]  9   _   _  [3]  _   5   4  [_]'
             ].join('\n'));
 
+            // freeze cells with numbers
+            (function() {
+                var x, y, cell;
+                for (y = 1; y < 10; ++y) {
+                    for (x = 1; x < 10; ++x) {
+                        cell = mtxEl.getCell(x, y);
+                        if (cell.getValue()) {
+                            cell.setFrozenState(true);
+                        }
+                    }
+                }
+            })();
+
+            // clicking on cells shows numpad...
             mtxEl.addEventListener('down', function(ev) {
                 //console.log('DOWN', ev.pos, ev.indices, ev.cell);
                 var cell = ev.cell;
-                if (cell.getNegative()) { return; }
+                if (cell.getInvertedState() || cell.getFrozenState()) { return; }
                 lastSelectedCell = cell;
                 numpadEl.show(ev.pos);
             });
 
+            //
             numpadEl.addEventListener('choice', function(ev) {
                 //console.log('CHOICE', ev.number, ev.cleared, ev.downTime);
                 var isToggleChoice = ev.number && ev.downTime < 250;
