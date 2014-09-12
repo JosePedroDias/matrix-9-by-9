@@ -12,7 +12,10 @@
             return ~~( Math.random() * len) + (min || 0);
         };
 
-        var toInt = function(n) { return parseInt(n, 10); };
+        var toInt = function(n) {
+            var i = parseInt(n, 10);
+            return (isNaN(i) ? undefined : i);
+        };
 
 
 
@@ -89,8 +92,9 @@
                 this._refresh();
             },
             setHighlight: function(active) {
-                if (this._negative) { return; }
-                this._highlight = !!active;
+                if (!this._negative) {
+                    this._highlight = !!active;
+                }
                 this._refresh();
             },
             setData: function(data) {
@@ -101,15 +105,13 @@
                 if (data[0] === '[') {
                     data = data.split(''); data.shift(); data.pop(); data = data.join('');
                     negative = true;
-                    num = toInt(data);
                 }
                 else if (data[0] === '(') {
                     data = data.split(''); data.shift(); data.pop(); data = data.join('');
                     hints = data.split(',').map(toInt);
                 }
-                else if (data !== '_') {
-                    num = toInt(data);
-                }
+
+                num = toInt(data);
 
                 this._update = false;
                 this.setValue(num);
@@ -146,8 +148,8 @@
 
                 c.save();
                 c.translate(p[0], p[1]);
-                c.fillStyle = ['rgb(', r(128, 128), ',', r(128, 128), ',', r(128, 128), ')'].join('');
-                //c.fillStyle = (this._highlight ? s.highlightColor : (this._negative ? s.fgColor : s.bgColor) );
+                // c.fillStyle = ['rgb(', r(128, 128), ',', r(128, 128), ',', r(128, 128), ')'].join('');
+                c.fillStyle = (this._highlight ? s.highlightColor : (this._negative ? s.fgColor : s.bgColor) );
                 c.fillRect(0, 0, d[0], d[1]);
 
                 c.fillStyle = this._negative ? s.bgColor : s.fgColor;

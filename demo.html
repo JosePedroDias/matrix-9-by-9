@@ -13,7 +13,7 @@
 
         <style type="text/css">
             body {
-                background-color: #FDD;
+                background-color: #DDD;
                 font-family: sans-serif;
             }
         </style>
@@ -21,20 +21,22 @@
 
     <body>
         <!-- Using Custom Elements -->
-        <matrix-9-by-9 side="200" id="m"></matrix-9-by-9>
+        <matrix-9-by-9 side="360" id="m"></matrix-9-by-9>
 
         <script type="text/javascript">
             var mtxEl = document.querySelector('#m');
+
+            // first level of easy on android's st8ts lite
             mtxEl.setData([
-                ' 1   2   3   4   5   6   7   8   9 ',
-                ' 2   2   3   4   5   6   7   8   9 ',
-                ' 3   2   3   4   5   6   7  [8]  9 ',
-                ' 1   2   3   4   5   6   7   8   9 ',
-                ' 1   2   3   4   5   6   7   8   9 ',
-                ' 1   2   3   4   5   6   7   8   9 ',
-                ' 1   _   3   4   5   6   7   8   (3,9) ',
-                ' _   2   3   4   5   6   7   8   9 ',
-                ' 9   2   3   4   5   6   7   8   9 '
+                '[_]  _   3   _  [_]  _   _   7  [_]',
+                '[1]  _   _   _  [_]  _   7   _   9 ',
+                ' _   _  [2]  _   _  [_] [_]  _   _ ',
+                ' 2   _  [_]  _   6   _   _   _   7 ',
+                '[_] [_]  5   _  [_]  3   _  [_] [6]',
+                ' _   _   _   _   _   _  [_]  _   _ ',
+                ' _   _  [_] [9]  4   _  [_]  _   3 ',
+                ' _   _   8   7  [_]  _   _   _  [_]',
+                '[_]  9   _   _  [3]  _   5   4  [_]'
             ].join('\n'));
 
             /*mtxEl.setAttribute('side', 300);*/
