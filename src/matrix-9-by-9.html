@@ -261,7 +261,7 @@
             this._resize();
 
             this._canvasEl.addEventListener('mousedown',  this._onDown.bind(this));
-            //this._canvasEl.addEventListener('touchstart', this._onDown.bind(this)); // TODO
+            this._canvasEl.addEventListener('touchstart', this._onDown.bind(this));
         };
 
         // fires when an instance was removed from the document
@@ -353,15 +353,25 @@
         };
 
         element._onDown = function(ev) {
+            ev.preventDefault(); ev.stopPropagation();
             var t = this._canvasEl.getBoundingClientRect();
             var topLeftPos = [
                 t.left,
                 t.top
             ];
-            var pos = [
-                ev.clientX - topLeftPos[0],
-                ev.clientY - topLeftPos[1]
-            ];
+            var pos;
+            if (ev.type === 'touchstart') {
+                pos = [
+                    ev.targetTouches[0].pageX - topLeftPos[0],
+                    ev.targetTouches[0].pageY - topLeftPos[1]
+                ];
+            }
+            else {
+                pos = [
+                    ev.clientX - topLeftPos[0],
+                    ev.clientY - topLeftPos[1]
+                ];
+            }
             var delta = this._dims[0] / 9;
             var indices = [
                 Math.floor(pos[0] / delta) + 1,
