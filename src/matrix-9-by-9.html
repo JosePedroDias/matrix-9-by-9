@@ -2,10 +2,6 @@
     (function() {
         'use strict';
 
-        var thatDoc = document;
-
-        // refers to the "importee", which is src/hello-world.html
-        var thisDoc = document._currentScript.ownerDocument;
 
 
         var r = function(len, min) {
@@ -253,6 +249,9 @@
             }
 
             this._resize();
+
+            this._canvasEl.addEventListener('mousedown',  this._onDown.bind(this));
+            //this._canvasEl.addEventListener('touchstart', this._onDown.bind(this)); // TODO
         };
 
         // fires when an instance was removed from the document
@@ -341,6 +340,34 @@
                 }
             }
             this._refresh();
+        };
+
+        element._onDown = function(ev) {
+            var t = this._canvasEl.getBoundingClientRect();
+            var topLeftPos = [
+                t.left,
+                t.top
+            ];
+            var pos = [
+                ev.clientX - topLeftPos[0],
+                ev.clientY - topLeftPos[1]
+            ];
+            var delta = this._dims[0] / 9;
+            var indices = [
+                Math.floor(pos[0] / delta) + 1,
+                Math.floor(pos[1] / delta) + 1
+            ];
+            var cell = this.getCell(indices[0], indices[1]);
+            //console.log(pos, indices, cell);
+
+            //var event = new Event('build');
+            //var pos =
+
+            ev = new Event('down');
+            ev.pos     = pos;
+            ev.indices = indices;
+            ev.cell    = cell;
+            this.dispatchEvent(ev);
         };
 
 

@@ -1,0 +1,99 @@
+<script type="text/javascript">
+    (function() {
+        'use strict';
+
+
+
+        // creates an object based in the HTML Element prototype
+        var element = Object.create(HTMLElement.prototype);
+
+        // fires when an instance of the element is created
+        element.createdCallback = function() {
+            // creates the shadow root
+            var rootEl = this.createShadowRoot();
+
+            var topEl = document.createElement('div');
+            topEl.style.display = 'inline-block';
+            topEl.style.width  =  '90px';
+            topEl.style.height = '120px';
+            topEl.style.backgroundColor = '#DDD';
+
+            var i, btnEl;
+            for (i = 0; i < 10; ++i) {
+                btnEl = document.createElement('button');
+                btnEl.appendChild( document.createTextNode( i === 9 ? 'clear' : i+1 ) );
+                btnEl.setAttribute('data-num', i === 9 ? 0 : i+1);
+                topEl.appendChild(btnEl);
+            }
+
+            rootEl.appendChild(topEl);
+
+            this._topEl = topEl;
+
+            this.style.display = 'inline-block';
+        };
+
+        // fires when an instance was inserted into the document
+        element.attachedCallback = function() {
+            this.dismiss();
+            this._topEl.addEventListener('mousedown', this._onDown.bind(this));
+            this._topEl.addEventListener('mouseup',   this._onUp.bind(this));
+            // this._topEl.addEventListener('touchstart', this._onDown.bind(this)); // TODO
+        };
+
+        // fires when an instance was removed from the document
+        element.detachedCallback = function() {
+
+        };
+
+        // Fires when an attribute was added, removed, or updated
+        element.attributeChangedCallback = function(attrName, oldVal, newVal) {
+            //console.log('attr changed:', attr, oldVal, newVal);
+            /*switch (attrName) {
+            }*/
+        };
+
+
+
+        element.show = function(pos) {
+            this.style.left = pos[0] + 'px';
+            this.style.top  = pos[1] + 'px';
+            this.style.display = 'inline-block';
+        };
+
+        element.dismiss = function() {
+            this.style.display = 'none';
+        };
+
+
+
+        element._onDown = function(ev) {
+            var tgtEl = ev.target;
+            var num = parseInt(tgtEl.getAttribute('data-num'), 10);
+            this._downNum = num;
+            this._downTime = (new Date()).valueOf();
+        };
+
+        element._onUp = function(ev) {
+            var tgtEl = ev.target;
+            var num = parseInt(tgtEl.getAttribute('data-num'), 10);
+            if (num !== this._downNum) { return; }
+            this.dismiss();
+
+            ev = new Event('choice');
+            ev.number   = num ? num : undefined;
+            ev.cleared  = (num === 0);
+            ev.downTime = (new Date()).valueOf() - this._downTime;
+            delete this._downTime;
+            delete this._downNum;
+
+            this.dispatchEvent(ev);
+        };
+
+
+
+        document.registerElement('numpad-1-to-9', {
+            prototype: element
+        });
+    }());
+</script>

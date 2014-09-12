@@ -91,6 +91,6 @@ you can affect single cells by calling the cell's API directly. Ex: `mtxEl.getCe
 
     * `_`     - empty cell
     * `4`     - numbered cell
-    * `(4,5)` - cell with hints
+    * `(3,5)` - cell with hints
     * `[_]`   - negative empty cell
-    * `[_]`   - negative numbered cell
+    * `[4]`   - negative numbered cell

@@ -11,21 +11,38 @@
 
         <!-- Importing Custom Elements -->
         <link rel="import" href="src/matrix-9-by-9.html">
+        <link rel="import" href="src/numpad-1-to-9.html">
 
         <style type="text/css">
             body {
                 background-color: #DDD;
                 font-family: sans-serif;
             }
+
+            .ctn {
+                position: relative;
+            }
+
+            numpad-1-to-9 {
+                position: absolute;
+                left: 0;
+                top:  0;
+            }
         </style>
     </head>
 
     <body>
         <!-- Using Custom Elements -->
-        <matrix-9-by-9 side="360" id="m"></matrix-9-by-9>
+        <div class="ctn">
+            <matrix-9-by-9 side="360" id="m"></matrix-9-by-9>
+            <numpad-1-to-9 id="n"></numpad-1-to-9>
+        </div>
 
         <script type="text/javascript">
-            var mtxEl = document.querySelector('#m');
+            var mtxEl    = document.querySelector('#m');
+            var numpadEl = document.querySelector('#n');
+
+            var lastSelectedCell;
 
             // first level of easy on android's st8ts lite
             mtxEl.setData([
@@ -40,7 +57,29 @@
                 '[_]  9   _   _  [3]  _   5   4  [_]'
             ].join('\n'));
 
-            /*mtxEl.setAttribute('side', 300);*/
+            mtxEl.addEventListener('down', function(ev) {
+                //console.log('DOWN', ev.pos, ev.indices, ev.cell);
+                var cell = ev.cell;
+                if (cell.getNegative()) { return; }
+                lastSelectedCell = cell;
+                numpadEl.show(ev.pos);
+            });
+
+            numpadEl.addEventListener('choice', function(ev) {
+                //console.log('CHOICE', ev.number, ev.cleared, ev.downTime);
+                var isToggleChoice = ev.number && ev.downTime < 250;
+                if (isToggleChoice) {
+                    lastSelectedCell.unsetValue();
+                    lastSelectedCell.toggleHint(ev.number);
+                }
+                else if (this.cleared) {
+                    lastSelectedCell.unsetValue();
+                    lastSelectedCell.setHints([]);
+                }
+                else {
+                    lastSelectedCell.setValue(ev.number);
+                }
+            });
         </script>
     </body>
 </html>
