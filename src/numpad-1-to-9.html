@@ -12,7 +12,32 @@
             // creates the shadow root
             var rootEl = this.createShadowRoot();
 
+            var styleEl = document.createElement('style');
+            styleEl.setAttribute('type', 'text/css');
+            styleEl.innerHTML = [
+                '.numpad {',
+                '  background-color: #111;',
+                //'  opacity: 0.85;',
+                '}',
+                'button {',
+                '  border: 0;',
+                '  margin: 0;',
+                '  padding: 0;',
+                '  font-size: 20px;',
+                '  font-family: sans-serif;',
+                '  color: #FFF;',
+                '  background-color: #333;',
+                '  width:  30px;',
+                '  height: 30px;',
+                '}',
+                'button:hover {',
+                '  background-color: #555;',
+                '}'
+            ].join('\n');
+            rootEl.appendChild(styleEl);
+
             var topEl = document.createElement('div');
+            topEl.className = 'numpad';
             topEl.style.display = 'inline-block';
             topEl.style.width  =  '90px';
             topEl.style.height = '120px';
@@ -23,6 +48,7 @@
                 btnEl = document.createElement('button');
                 btnEl.appendChild( document.createTextNode( i === 9 ? 'clear' : i+1 ) );
                 btnEl.setAttribute('data-num', i === 9 ? 0 : i+1);
+                if (i === 9) { btnEl.style.width = '90px'; }
                 topEl.appendChild(btnEl);
             }
 
@@ -56,6 +82,11 @@
 
 
         element.show = function(pos) {
+            pos = [
+                pos[0] - 45,
+                pos[1]
+            ];
+            if (pos[0] < 0) { pos[0] = 0; }
             this.style.left = pos[0] + 'px';
             this.style.top  = pos[1] + 'px';
             this.style.display = 'inline-block';
