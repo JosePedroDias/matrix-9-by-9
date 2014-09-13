@@ -66,9 +66,6 @@
                 return this;
             },
             setHints: function(hints) {
-                if (hints.length > 0) {
-                    this._value = undefined;
-                }
                 this._hints = hints;
                 this._hintsO = {};
                 for (var i = 0, I = this._hints.length; i < I; ++i) {
@@ -78,7 +75,6 @@
                 return this;
             },
             setHint: function(n) {
-                this._value = undefined;
                 this._setHint(n, true);
                 this._refresh();
                 return this;
@@ -353,7 +349,7 @@
         };
 
         element._onDown = function(ev) {
-            ev.preventDefault(); ev.stopPropagation();
+            ev.preventDefault(); //ev.stopPropagation();
             var t = this._canvasEl.getBoundingClientRect();
             var topLeftPos = [
                 t.left,
@@ -362,8 +358,8 @@
             var pos;
             if (ev.type === 'touchstart') {
                 pos = [
-                    ev.targetTouches[0].pageX - topLeftPos[0],
-                    ev.targetTouches[0].pageY - topLeftPos[1]
+                    ev.targetTouches[0].pageX - topLeftPos[0] - document.body.scrollLeft,
+                    ev.targetTouches[0].pageY - topLeftPos[1] - document.body.scrollTop
                 ];
             }
             else {

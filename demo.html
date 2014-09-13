@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-
+        <meta name="viewport" content="width=device-width, user-scalable=yes">
         <title>matrix-9-by-9 element demo</title>
 
         <!-- Importing Web Component's Polyfill -->
@@ -41,7 +41,7 @@
 
         <!-- Using Custom Elements -->
         <div class="ctn">
-            <matrix-9-by-9 side="360" id="m"></matrix-9-by-9>
+            <matrix-9-by-9 side="270" id="m"></matrix-9-by-9>
             <numpad-1-to-9 id="n"></numpad-1-to-9>
         </div>
 
@@ -103,7 +103,7 @@
                     lastSelectedCell.unsetValue();
                     lastSelectedCell.toggleHint(ev.number);
                 }
-                else if (this.cleared) {
+                else if (ev.cleared) {
                     lastSelectedCell.unsetValue();
                     lastSelectedCell.setHints([]);
                 }
